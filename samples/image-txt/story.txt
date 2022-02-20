@@ -1,0 +1,11 @@
+I am a story
+
+@img1
+
+There is an image included with the story
+
+@img2
+
+The image can also be a .gif
+
+@img3

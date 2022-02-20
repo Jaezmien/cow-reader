@@ -1,0 +1,47 @@
+.cowalert-list-enter-active,
+.cowalert-list-leave-active {
+	position: sticky;
+	display: inline-block;
+	transition: all 500ms;
+}
+.cowalert-list-enter,
+.cowalert-list-leave-to {
+	opacity: 0;
+	// transform: translateX(5em)
+}
+.cowalert-list-move {
+	transition: transform 500ms;
+}
+
+#cowalert {
+	overflow-x: hidden;
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+
+	.list {
+		display: flex;
+		flex-direction: column;
+
+		span {
+			display: inline-block;
+			word-wrap: break-word;
+
+			&.info {
+				background-color: #d1ecf1;
+				color: #0c5460;
+			}
+			&.alert {
+				background-color: #f8d7da;
+				color: #721c24;
+			}
+			&.warning {
+				background-color: #fff3cd;
+				color: #856404;
+			}
+
+			padding: 1em 1em;
+		}
+	}
+}

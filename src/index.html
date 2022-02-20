@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Cow Reader</title>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+	<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+	<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script> -->
+
+</head>
+
+<body>
+
+	<div id="app">
+		<article id="content" class="container" v-if="storyStore.id > 0">
+
+			<!-- Title Header -->
+			<div class="header">
+
+				<h1>{{ story.Title ? story.Title : storyDetails.filename }}</h1>
+				<p v-if="story.Format"> By: <b>{{ story.Author }}</b> </p>
+
+			</div>
+
+			<!-- Navbar -->
+			<nav v-if="story.Format && Object.keys( this.story.Chapters ).length > 0"
+				@dblclick.self="show_chapter_select">
+				<i class="material-icons" id="left" @click="set_new_page(-1)"
+					:class="{ 'disabled': this.currentChapter-1 < 0 }">keyboard_arrow_left</i>
+				<h4 id="title"> {{ Object.keys(story.Chapters)[ currentChapter ] }} </h4>
+				<i class="material-icons" id="right" @click="set_new_page(1)"
+					:class="{ 'disabled': this.currentChapter+1 > Object.keys( this.story.Chapters ).length-1 }">keyboard_arrow_right</i>
+
+			</nav>
+
+			<!-- Chapter Contents -->
+			<article>
+
+				<div id="bookmark">
+					<div class="inner"></div>
+				</div>
+
+				<div id="contents">
+					<cow-line v-for="(content, index) in computedCurrentChapter" :key="$generateId(8)"
+						:content="content">
+					</cow-line>
+				</div>
+
+			</article>
+
+			<!-- Chapter selection -->
+			<section id="chapterSelect" v-if="showChapterSelect" @click.self="hide_chapter_select">
+
+				<div>
+					<p v-for="chapter in Object.keys( story.Chapters )" @click="select_chapter( chapter )">
+						{{ chapter }}
+					</p>
+				</div>
+
+			</section>
+
+		</article>
+
+		<div v-show="storyStore.id === -1" id="splash">
+			<div>
+				<h1>Cow Reader</h1>
+				<p>Drag and drop a story!</p>
+			</div>
+		</div>
+
+		<div id="drop">Drop the file here!</div>
+
+		<CowAlert></CowAlert>
+	</div>
+
+</body>
+
+</html>
