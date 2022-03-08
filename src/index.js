@@ -116,16 +116,12 @@ Vue.component('CowLine', {
 			const children = []
 			this.content.children.forEach((x) => {
 				if (typeof x === 'string') children.push(this.sanitize_string(x))
-				else if (x.children)
-					x.children.forEach((y) => {
-						children.push(create('cow-line', { props: { content: y } }))
-					})
-				else if (!x.children) children.push(create(x.tag, this.sanitize_attr(x.attr), x.data))
+				else children.push(create('cow-line', { props: { content: x } }))
 			})
 			return create(this.content.tag, this.sanitize_attr(this.content.attr), children)
 		}
 
-		return create(this.content.tag, this.sanitize_attr(this.content.attr))
+		return create(this.content.tag, this.sanitize_attr(this.content.attr), this.content.data)
 	},
 })
 

@@ -66,39 +66,75 @@ function objectify_html(o: HTMLElement, depth: number = 1): objectHTMLTree | str
 function ParseFiMHTMLStory(content: string, Story: FiMStory): FiMStory {
 	const dom = parseHTML(content)
 
-	// Information
-	{
-		Story.Title = dom.querySelector('header h1 a').textContent
-		Story.Author = dom.querySelector('header h2 a').textContent
-	}
+	if (!dom.querySelector('header h1 a') && !dom.querySelector('header h2 a')) {
+		// FIXME: This probably looks cursed? Maybe find a better way to do this.
 
-	// Chapters
-	{
-		dom.querySelectorAll('article.chapter').forEach((chapterElement) => {
-			const chapterName = chapterElement
-				.querySelector('header h1')
-				.childNodes.find((x) => x.rawText)!
-				.toString()
+		Story.Title = dom.querySelector('h1 a').textContent
+		Story.Author = dom.querySelector('h2 a').textContent
 
-			const children = chapterElement.childNodes.filter((x) => {
-				if (x.nodeType === 3 && !x.textContent.trim()) return false
-				return true
-			})
+		// Chapter
 
-			const startRegex = /<header[^>]*>/
-			const endRegex = /<(aside|footer)[^>]*>/
+		const bodyChildren = dom.querySelector('body').childNodes
 
-			while (startRegex.test(children[0].toString())) children.shift()
-			while (endRegex.test(children[children.length - 1].toString())) children.pop()
-
-			const chapterContents = []
-			for (let i = 0; i < children.length; i++) {
-				const content = objectify_html(children[i] as unknown as HTMLElement, 0) // dont ask me about this, i don't know either
-				chapterContents.push(content)
+		let chapterName = ''
+		let startIndex = 0
+		while (startIndex < bodyChildren.length) {
+			const el = bodyChildren[startIndex] as unknown as HTMLElement
+			if (el.tagName === 'H3') {
+				chapterName = el.textContent
+				startIndex++ // Skip before breaking
+				break
 			}
+			startIndex++
+		}
 
-			Story.Chapters[chapterName] = chapterContents
-		})
+		if (!chapterName.trim() || startIndex == bodyChildren.length) {
+			throw 'Failed to parse story!'
+		}
+
+		const chapterContents = []
+		for (let i = startIndex; i < bodyChildren.length; i++) {
+			const node = bodyChildren[i] as unknown as HTMLElement
+			if (node.textContent && !chapterContents.length && !node.textContent.trim()) continue
+			chapterContents.push(objectify_html(node, 0))
+		}
+
+		Story.Chapters[chapterName] = chapterContents
+	} else {
+		// Information
+		{
+			Story.Title = dom.querySelector('header h1 a').textContent
+			Story.Author = dom.querySelector('header h2 a').textContent
+		}
+
+		// Chapters
+		{
+			dom.querySelectorAll('article.chapter').forEach((chapterElement) => {
+				const chapterName = chapterElement
+					.querySelector('header h1')
+					.childNodes.find((x) => x.rawText)!
+					.toString()
+
+				const children = chapterElement.childNodes.filter((x) => {
+					if (x.nodeType === 3 && !x.textContent.trim()) return false
+					return true
+				})
+
+				const startRegex = /<header[^>]*>/
+				const endRegex = /<(aside|footer)[^>]*>/
+
+				while (startRegex.test(children[0].toString())) children.shift()
+				while (endRegex.test(children[children.length - 1].toString())) children.pop()
+
+				const chapterContents = []
+				for (let i = 0; i < children.length; i++) {
+					const content = objectify_html(children[i] as unknown as HTMLElement, 0) // dont ask me about this, i don't know either
+					chapterContents.push(content)
+				}
+
+				Story.Chapters[chapterName] = chapterContents
+			})
+		}
 	}
 
 	return Story
