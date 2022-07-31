@@ -1,3 +1,6 @@
+# THIS PROJECT IS NOW ABANDONED! IT IS NOW REPLACED BY [BOOKSHELF](https://github.com/Jaezmien/Bookshelf)
+
+
 <div align="center">
   
 # Cow Reader
